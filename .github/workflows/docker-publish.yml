@@ -37,3 +37,15 @@ jobs:
  
       - name: Push Docker image
         run: docker push ${{ secrets.DOCKER_USERNAME }}/cicdapp2:latest
+
+      - name: Deploy on VPS
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            docker pull ${{ secrets.DOCKER_USERNAME }}/cicdapp2:latest
+            docker stop cicdapp || true
+            docker rm cicdapp || true
+            docker run -d --name cicdapp2 -p 3031:3000 ${{ secrets.DOCKER_USERNAME }}/cicdapp2:latest
