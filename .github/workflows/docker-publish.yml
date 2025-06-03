@@ -1,40 +1,40 @@
 name: CI/CD - Docker Build & Push
- 
+
 on:
   push:
-    branches: [ "main" ]
- 
+    branches: ["main"]
+
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
- 
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
- 
+
       - name: Set up Node.js (if you're using Node)
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
- 
+          node-version: "20"
+
       - name: Install dependencies
         run: npm install
 
       - name: Install Jest
         run: npm install --save-dev jest
- 
+
       - name: Run tests
-        run: npm test  
- 
+        run: npm test
+
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
- 
+
       - name: Build Docker image
         run: docker build -t ${{ secrets.DOCKER_USERNAME }}/cicdapp2:latest .
- 
+
       - name: Push Docker image
         run: docker push ${{ secrets.DOCKER_USERNAME }}/cicdapp2:latest
 
@@ -46,6 +46,6 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
             docker pull ${{ secrets.DOCKER_USERNAME }}/cicdapp2:latest
-            docker stop cicdapp || true
-            docker rm cicdapp || true
+            docker stop cicdapp2 || true
+            docker rm cicdapp2 || true
             docker run -d --name cicdapp2 -p 3031:3000 ${{ secrets.DOCKER_USERNAME }}/cicdapp2:latest
